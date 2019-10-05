@@ -1,16 +1,21 @@
 # Entware Over SSL/TLS For DD-WRT Installations
 
-All software for DD-WRT routers from official Entware, including installation scripts, packet manager bootstrapping, and installable packages, is distributed though the open Internet via HTTP without any kind of security. This is unacceptable: any actor between Entware's repository and DD-WRT clients can trivially and completely pwn the clients.
+All software modules from official Entware, including installation scripts, the packet manager, and installable packages, are distributed though the open Internet via HTTP without any kind of security. This is unacceptable: any actor between Entware's repository and its clients can trivially and completely compromise the clients.
 
-Fortunately, Entware servers do support HTTPS. This repo provides tools that take advantage of this fact in order to allow fully secure Entware installtions on DD-WRT devices.
+Fortunately, the Entware servers themselves do support HTTPS. This repository provides tools that allow secure Entware over SSL/TLS installtions on DD-WRT devices. (Other devices can also use these tools but may require different installation procedures.)
 
 ### Secure Entware Installation
 
-Prerequisite: a Linux filesystem partition on non-volatile storage auto-mounted on `/opt` (preferably formatted as ext4).
+Prerequisites:
 
-0. If you have already installed Entware though insecure HTTP before, consider the possibility that your router may have been pwned. You might want to wipe `/opt`, reflash DD-WRT, and reset to factory defaults.
+* A DD-WRT installation that supports SSL/TLS (HTTPS URLs) on its `ẁget` or `curl` commands.
+* A Linux filesystem partition on non-volatile storage auto-mounted on `/opt` (preferably formatted as ext4).
 
-1. Run these commands on the DD-WRT router via SSH or Telnet:
+Procedure:
+
+0. If you have already installed Entware though insecure HTTP before, consider the possibility that your router may have been compromised. You might want to wipe `/opt`, reflash DD-WRT, and reset to factory defaults.
+
+1. Run these commands on the DD-WRT router via SSH or Telnet to download the Entware installation script patcher:
    ```
    cd /opt
    wget 'https://raw.githubusercontent.com/Lanchon/ddwrt-secure-entware/master/patch-installer.sh'
@@ -22,7 +27,7 @@ Prerequisite: a Linux filesystem partition on non-volatile storage auto-mounted 
    uname -m
    ```
 
-3. Fetch the Entware install script that corresponds to your hardware architecture as explained in regular Entware install how-to's, but **make sure to replace the URL's protocol identifier from 'http:' to 'https:'**.
+3. Fetch the Entware installation script that corresponds to your hardware architecture as explained in regular Entware installation how-to's, but **make sure to change the URL's protocol identifier from 'http:' to 'https:'**.
 
    * For **ARMv7** architecture:
      ```
@@ -45,7 +50,7 @@ Prerequisite: a Linux filesystem partition on non-volatile storage auto-mounted 
    sh generic.sh
    ```
 
-5. Add this line at the **end** of the **startup** script in DD-WRT's **Administration/Commands**:
+5. Finally add this line at the **end** of the **startup** script in DD-WRT's **Administration/Commands**:
    ```
    /opt/etc/init.d/rc.unslung start
    ```
@@ -64,7 +69,19 @@ Curlize is a simple script that intercepts a few hand-picked command-line format
 
 ### Curlize Installation
 
-1. Run these commands on the DD-WRT router via SSH or Telnet:
+Prerequisites:
+
+* A DD-WRT installation that supports SSL/TLS (HTTPS URLs) on its `curl` command. (Larger DD-WRT builds do.)
+
+Procedure:
+
+0. Run this command on the DD-WRT router via SSH or Telnet to test `curl`'s HTTPS support: 
+   ```
+   curl -fL -o /dev/null 'https://github.com/Lanchon/ddwrt-secure-entware'
+   ```
+   You should either see a progress report or a 'protocol not supported' error. If HTTPS is not supported on your installation, you are out of luck.
+
+1. Download and install the necessary files:
    ```
    mkdir -p /opt/bin-override /opt/sbin-override
    cd /opt/bin-override
@@ -73,7 +90,7 @@ Curlize is a simple script that intercepts a few hand-picked command-line format
    ln -s curlize-wget wget
    ```
 
-2. Add these lines at the **beginning** of the **startup** script in DD-WRT's **Administration/Commands**:
+2. Finally add these lines at the **beginning** of the **startup** script in DD-WRT's **Administration/Commands**:
    ```
    echo 'export PATH="/opt/bin-override:/opt/sbin-override:$PATH"' >>/tmp/root/.profile
    chmod +x /tmp/root/.profile
