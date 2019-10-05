@@ -40,7 +40,7 @@ parse3() {
             if [[ $quiet = 0 ]]; then
                 echo "Downloading $src"
             fi
-            if curl -fs $dest_opt "$dest" "$src"; then
+            if curl -Lfs $dest_opt "$dest" "$src"; then
                 exit 0
             else
                 >&2 echo "curlize: download error: $src"
