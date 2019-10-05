@@ -60,6 +60,24 @@ Procedure:
    /opt/etc/init.d/rc.unslung stop
    ```
 
+7. If you had to install Curlize earlier, please read the following section.
+
+### Curlize Replacement
+
+If you had to install Curlize to bootstrap Entware, you can either keep using it indefinitely or you can replace it with a full-fledged version of `wget`.
+
+1. To replace Curlize, run these commands on the DD-WRT router via SSH or Telnet:
+   ```
+   opkg update
+   opkg install wget ca-certificates
+   ln -sf /opt/bin/wget /opt/bin-override/wget
+   ```
+
+2. Finally test the full-fledged version of `wget`:
+   ```
+   opkg update
+   ```
+
 
 # Curlize
 
