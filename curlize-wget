@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Author: Lanchon
+
+set -e
+
+parse() {
+    if [[ "$1" == -q ]]; then
+        shift
+        parse2 1 "$@"
+    else
+        parse2 0 "$@"
+    fi
+}
+
+parse2() {
+    local quiet="$1"
+    if [[ $# == 2 ]]; then
+        parse3 $quiet "$2"
+    elif [[ $# == 4 ]]; then
+        if [[ "$2" == -O ]]; then
+            parse3 $quiet "$4" "$3"
+        elif [[ "$3" == -O ]]; then
+            parse3 $quiet "$2" "$4"
+        fi
+    fi
+}
+
+parse3() {
+    local quiet="$1"
+    local src="$2"
+    local dest="$3"
+    local dest_opt=-o
+    if [[ $# == 2 ]]; then
+        dest=-O
+        dest_opt=
+    fi
+    case "$src" in
+        "https:"*)
+            if [[ $quiet = 0 ]]; then
+                echo "Downloading $src"
+            fi
+            if curl -fs $dest_opt "$dest" "$src"; then
+                exit 0
+            else
+                >&2 echo "curlize: download error: $src"
+                exit 1
+            fi
+            ;;
+    esac
+}
+
+parse "$@"
+
+exec /usr/bin/wget "$@"
