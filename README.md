@@ -69,8 +69,9 @@ If you had to install Curlize to bootstrap Entware, you can either keep using it
 1. To replace Curlize, run these commands on the DD-WRT router via SSH or Telnet:
    ```
    opkg update
-   opkg install wget ca-certificates
-   ln -sf /opt/bin/wget /opt/bin-override/wget
+   opkg install ca-certificates
+   opkg install wget-ssl
+   rm /opt/bin-override/wget
    ```
 
 2. Finally test the full-fledged version of `wget`:
